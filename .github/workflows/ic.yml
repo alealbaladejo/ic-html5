@@ -1,19 +1,30 @@
 name: CI
+
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: pip
-      run: sudo  pip install html5validator
-    - name: Test html5
-      run: html5validator --root _build/
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 18
-    - name: Install surge
-      run: npm install -g surge
-    - name: Deploy to alealbaladejo@surge.sh
-      run: surge ./_build/ alealbaladejo.surge.sh --token ${{ secrets.SURGE_TOKEN }}   
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tidy
+          sudo pip install html5validator
+
+      - name: Test HTML5
+        run: html5validator --root _build/ --ignore warnings
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar Surge
+        run: npm install -g surge
+
+      - name: Deploy to Surge
+        run: surge ./_build/ alealbaladejo.surge.sh --token ${{ secrets.SURGE_TOKEN }}
